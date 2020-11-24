@@ -1,5 +1,6 @@
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecommerce/components/Products.dart';
 import 'package:ecommerce/db/Product_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -43,6 +44,8 @@ class _ProductDetailsState extends State<ProductDetails> {
     RadioModel(false, '11', 10),
   ];
   CartProductService _productService = CartProductService();
+  CartProductService _cartProductService = CartProductService();
+  List<DocumentSnapshot> products = <DocumentSnapshot>[];
   String size = null;
   bool isLoading = false;
   final _auth = FirebaseAuth.instance;
@@ -50,6 +53,7 @@ class _ProductDetailsState extends State<ProductDetails> {
   void initState() {
     super.initState();
     getCurrentUser();
+    getCartProducts();
   }
 
   void getCurrentUser() async {
@@ -73,6 +77,19 @@ class _ProductDetailsState extends State<ProductDetails> {
     }
   }
 
+  getCartProducts() async {
+    setState(() {
+      isLoading = true;
+    });
+    List<DocumentSnapshot> data =
+    await _cartProductService.getCartProducts().catchError((e) {
+      print(e);
+    });
+    setState(() {
+      products = data;
+      isLoading = false;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     Widget imageCarousal = Container(
@@ -108,13 +125,53 @@ class _ProductDetailsState extends State<ProductDetails> {
                       fontSize: 25, color: Colors.white, fontFamily: 'Lobster'),
                 ),
               ),
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => HomeScreen()));
+                },
+              ),
               actions: <Widget>[
-                IconButton(
-                    icon: Icon(Icons.shopping_cart, color: Colors.white),
-                    onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => Cart()));
-                    })
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Cart()));
+                  },
+                  child: new Stack(
+                    children: <Widget>[
+                      new IconButton(
+                        icon: new Icon(
+                          Icons.shopping_cart,
+                          color: Colors.white,
+                        ),
+                        onPressed: null,
+                      ),
+                      products.length!=0?
+                      Positioned(
+                          top: 3.0,
+                          right: 4,
+                          child: new Stack(
+                            children: <Widget>[
+                              new Icon(Icons.brightness_1,
+                                  size: 18.0, color: Colors.white),
+                              new Positioned(
+                                  top: 3.0,
+                                  right: 5.0,
+                                  child: new Center(
+                                    child: new Text(
+                                      products.length.toString(),
+                                      style: new TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 11.0,
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                  )),
+                            ],
+                          )):Container(),
+                    ],
+                  ),
+                )
               ],
             ),
 
@@ -224,6 +281,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                               });
                               _productService.uploadProducts(
                                 quantity: 1,
+                                category: widget.product_category,
                                 brand: widget.product_brand_name,
                                 details: widget.product_details,
                                 description: widget.product_description,
@@ -258,6 +316,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                               });
                               _productService.uploadProducts(
                                 quantity: 1,
+                                category: widget.product_category,
                                 brand: widget.product_brand_name,
                                 details: widget.product_details,
                                 description: widget.product_description,
@@ -267,6 +326,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                 images: widget.product_images,
                               );
                               setState(() {
+                                getCartProducts();
                                 isLoading=false;
                               });
                               Fluttertoast.showToast(msg: "Product added to cart",backgroundColor: Colors.black,textColor: Colors.white,);
@@ -347,134 +407,12 @@ class _ProductDetailsState extends State<ProductDetails> {
                     ),
                     Container(
                       height: 400.0,
-                      child: SimilarProducts(),
+                      child: Products(widget.product_category.toString()),
                     ),
                   ],
                 ),
               ],
             ),
           );
-  }
-}
-
-//===================================Similar Products=============================================================================
-class SimilarProducts extends StatefulWidget {
-  @override
-  _SimilarProductsState createState() => _SimilarProductsState();
-}
-
-class _SimilarProductsState extends State<SimilarProducts> {
-  ProductService _productService = ProductService();
-  List<DocumentSnapshot> products = <DocumentSnapshot>[];
-  bool isLoading = false;
-  @override
-  void initState() {
-    _getProduct();
-    super.initState();
-  }
-
-  _getProduct() async {
-    setState(() {
-      isLoading = true;
-    });
-    List<DocumentSnapshot> data =
-        await _productService.getProducts().catchError((e) {
-      print(e);
-    });
-    setState(() {
-      products = data;
-      isLoading = false;
-    });
-  }
-
-  ProductDetails productDetails = ProductDetails();
-
-  @override
-  Widget build(BuildContext context) {
-    return isLoading
-        ? Center(child: CircularProgressIndicator())
-        : GridView.builder(
-            itemCount: products.length,
-            gridDelegate:
-                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-            itemBuilder: (BuildContext context, int index) {
-              return Similar_Single_Product(
-                prod_brand_name: products[index]['brand'],
-                prod_displayname: products[index]['displayName'],
-                prod_description: products[index]['description'],
-                prod_details: products[index]['details'],
-                prod_image: products[index]['images'],
-                prod_oldPrice: products[index]['oldPrice'],
-                prod_price: products[index]['currentPrice'],
-              );
-            });
-  }
-}
-
-class Similar_Single_Product extends StatelessWidget {
-  final prod_displayname;
-  final prod_brand_name;
-  final prod_description;
-  final prod_details;
-  final List prod_image;
-  final prod_oldPrice;
-  final prod_price;
-  Similar_Single_Product(
-      {this.prod_displayname,
-      this.prod_brand_name,
-      this.prod_description,
-      this.prod_details,
-      this.prod_image,
-      this.prod_oldPrice,
-      this.prod_price});
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Material(
-        child: InkWell(
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(
-                builder: (context) => ProductDetails(
-                      product_brand_name: prod_brand_name,
-                      product_description: prod_description,
-                      product_details: prod_details,
-                      product_images: prod_image,
-                      product_new_price: prod_price,
-                      product_old_price: prod_oldPrice,
-                    )),
-          ),
-          child: GridTile(
-            footer: Container(
-              color: Colors.white70,
-              child: ListTile(
-                leading: Text(
-                  '$prod_displayname',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                title: (Text(
-                  'Rs:$prod_price',
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.w800,
-                  ),
-                )),
-                subtitle: Text(
-                  'Rs$prod_oldPrice',
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontWeight: FontWeight.w800,
-                    decoration: TextDecoration.lineThrough,
-                  ),
-                ),
-              ),
-            ),
-            child: Image.network(
-              prod_image[0],
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }

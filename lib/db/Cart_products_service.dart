@@ -12,6 +12,7 @@ class CartProductService {
 
   void uploadProducts({
     String brand,
+    String category,
     String description,
     String details,
     double currentPrice,
@@ -25,6 +26,7 @@ class CartProductService {
     _firestore.collection('user').document(loggedInUser.uid).collection(ref).document(productId).setData({
       'id': productId,
       'brand': brand,
+      'category':category,
       'description':description,
       'details':details,
       'currentPrice':currentPrice,

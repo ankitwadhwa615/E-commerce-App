@@ -5,7 +5,6 @@ import 'package:flutter/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ecommerce/db//users.dart';
 import 'package:ecommerce/models/user.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 enum Status{Uninitialized, Authenticated, Authenticating, Unauthenticated}
@@ -19,7 +18,6 @@ class UserProvider with ChangeNotifier{
   Firestore _firestore = Firestore.instance;
   UserServices _userService = UserServices();
   UserModel _userModel;
-  SharedPreferences prefs;
   FirebaseUser currentUser;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 

@@ -2,8 +2,11 @@ import 'package:ecommerce/Pages/Prduct_Details.dart';
 import'package:ecommerce/db/Product_service.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../components/loading.dart';
 
 class Products extends StatefulWidget {
+  final filter;
+  Products(this.filter);
   @override
   _ProductsState createState() => _ProductsState();
 }
@@ -14,23 +17,77 @@ class _ProductsState extends State<Products> {
   bool isLoading=false;
   @override
   void initState() {
-  _getProduct();
+    checkFilter(widget.filter);
     super.initState();
   }
 _getProduct() async {
   setState(() {
     isLoading=true;
   });
-  List<DocumentSnapshot> data = await _productService.getProducts().catchError((e){print(e);});
+  List<DocumentSnapshot> data = await _productService.getProducts()
+      .catchError((e){print(e);});
   setState(() {
     products = data;
     isLoading=false;
   });
 }
+  _getProductsAscending() async {
+    setState(() {
+      isLoading=true;
+    });
+    List<DocumentSnapshot> data = await _productService.getProductsAscending()
+        .catchError((e){print(e);});
+    setState(() {
+      products = data;
+      isLoading=false;
+    });
+  }
+  _getProductsDescending() async {
+    setState(() {
+      isLoading=true;
+    });
+    List<DocumentSnapshot> data = await _productService.getProductsDescending()
+        .catchError((e){print(e);});
+    setState(() {
+      products = data;
+      isLoading=false;
+    });
+  }
+
+  _getProductsByCategory() async {
+    setState(() {
+      isLoading=true;
+    });
+    List<DocumentSnapshot> data = await _productService.getProductsByCategory(widget.filter)
+        .catchError((e){print(e);});
+    setState(() {
+      products = data;
+      isLoading=false;
+    });
+  }
+void checkFilter(filter){
+    switch (filter){
+      case '':{
+        _getProduct();
+      }break;
+      case "lowToHigh":{
+        _getProductsAscending();
+      }break;
+      case 'highToLow':{
+        _getProductsDescending();
+      }break;
+      case 'newArrivals':{
+        _getProduct();
+      }break;
+      default:{
+        _getProductsByCategory();
+      }break;
+    }
+}
   // ignore: non_constant_identifier_names
   @override
   Widget build(BuildContext context) {
-    return isLoading?Center(child: CircularProgressIndicator()):GridView.builder(
+    return isLoading?Loading():GridView.builder(
         itemCount: products.length,
         gridDelegate:
             SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),

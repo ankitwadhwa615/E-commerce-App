@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecommerce/Pages/HomePage.dart';
+import 'package:ecommerce/Pages/Prduct_Details.dart';
 import 'package:ecommerce/db/Cart_products_service.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -11,7 +13,7 @@ class Cart extends StatefulWidget {
 }
 
 class _CartState extends State<Cart> {
-  CartProductService _productService = CartProductService();
+  CartProductService _cartProductService = CartProductService();
   List<DocumentSnapshot> products = <DocumentSnapshot>[];
   double totalAmount=0;
   var quantity = [1, 2, 3];
@@ -26,7 +28,7 @@ class _CartState extends State<Cart> {
       isLoading=true;
       totalAmount=0;
     });
-    List<DocumentSnapshot> data = await _productService.getCartProducts().catchError((e){print(e);});
+    List<DocumentSnapshot> data = await _cartProductService.getCartProducts().catchError((e){print(e);});
     setState(() {
       products = data;
       for(int i=0;i<products.length;i++){
@@ -41,7 +43,7 @@ class _CartState extends State<Cart> {
     setState(() {
       isLoading=true;
     });
-    List<DocumentSnapshot> data = await _productService.getCartProducts().catchError((e){print(e);});
+    List<DocumentSnapshot> data = await _cartProductService.getCartProducts().catchError((e){print(e);});
     setState(() {
       products = data;
 
@@ -61,6 +63,13 @@ class _CartState extends State<Cart> {
           'Shopping cart',
           style: TextStyle(color: Colors.white,fontFamily: 'Lobster'),
         ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => HomeScreen()));
+          },
+        ),
       ),
 
 
@@ -69,143 +78,160 @@ class _CartState extends State<Cart> {
           itemBuilder: (context, index) {
             return Padding(
               padding: const EdgeInsets.only(top:5.0),
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Column(
-                              children: <Widget>[
-                                Container(
-                                    height: 100.0,
-                                    child: Image.network('${products[index]['images'][0]}')),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 5.0),
-                                  child: Card(
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: <Widget>[
-                                        Text('Quantity:  ',style: TextStyle(fontWeight: FontWeight.bold),),
-                                        DropdownButtonHideUnderline(
-                                          child: DropdownButton<int>(
-                                            elevation: 0,
-                                            iconEnabledColor: Colors.black,
-                                            items: quantity.map((int dropDownStringItem) {
-                                              return DropdownMenuItem<int>(
-                                                value: dropDownStringItem,
-                                                child: Text('${dropDownStringItem}'),
-                                              );
-                                            }).toList(),
-                                            onChanged: (int quantitySelected){
-                                              setState(() {
-                                                _productService.updateData(products[index]['id'], quantitySelected);
-                                                getProductAndAmount();
-                                              });
-                                            },
-                                            value: products[index]['quantity'],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            flex: 2,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+              child: InkWell(
+                onTap:(){
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (context) => ProductDetails(
+                          product_id: products[index]['id'],
+                          product_category: products[index]['category'],
+                          product_brand_name: products[index]['brand'],
+                          product_description: products[index]['description'],
+                          product_details: products[index]['details'],
+                          product_images: products[index]['images'],
+                          product_new_price: products[index]['currentPrice'],
+                          product_old_price: products[index]['oldPrice'],
+                        )),
+                  );
+                },
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            Expanded(
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: <Widget>[
+                                  Container(
+                                      height: 100.0,
+                                      child: Image.network('${products[index]['images'][0]}')),
                                   Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      '${products[index]['brand']}',
-                                      style: TextStyle(
-                                          fontSize: 20.0, fontWeight: FontWeight.w600),
+                                    padding: const EdgeInsets.only(top: 5.0),
+                                    child: Card(
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          Text('Quantity:  ',style: TextStyle(fontWeight: FontWeight.bold),),
+                                          DropdownButtonHideUnderline(
+                                            child: DropdownButton<int>(
+                                              elevation: 0,
+                                              iconEnabledColor: Colors.black,
+                                              items: quantity.map((int dropDownStringItem) {
+                                                return DropdownMenuItem<int>(
+                                                  value: dropDownStringItem,
+                                                  child: Text('${dropDownStringItem}'),
+                                                );
+                                              }).toList(),
+                                              onChanged: (int quantitySelected){
+                                                setState(() {
+                                                  _cartProductService.updateData(products[index]['id'], quantitySelected);
+                                                  getProductAndAmount();
+                                                });
+                                              },
+                                              value: products[index]['quantity'],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 5.0, bottom: 5.0),
-                                    child: Text('${products[index]['description']}',
-                                      style: TextStyle(
-                                          fontSize: 15.0,
-                                          fontWeight: FontWeight.w300,
-                                          color: Colors.black54),
-                                    ),
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Text(
-                                        "Size:",
-                                        style: TextStyle(
-                                            fontSize: 15.0, fontWeight: FontWeight.bold),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(products[index]['size']),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Text(
-                                        '₹${products[index]['currentPrice']}',
-                                        style: TextStyle(
-                                            color: Colors.redAccent,
-                                            fontSize: 20.0,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                      SizedBox(
-                                        width: 10.0,
-                                      ),
-                                      Text(
-                                        '${products[index]['oldPrice']}',
-                                        style: TextStyle(
-                                          fontSize: 15.0,
-                                          color: Colors.black54,
-                                          fontWeight: FontWeight.w500,
-                                          decoration: TextDecoration.lineThrough,
-                                        ),
-                                      ),
-                                    ],
                                   ),
                                 ],
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      MaterialButton(
-                        onPressed: () {
-                          setState(() {
-                            isLoading=true;
-                          });
-                          _productService.deleteData(products[index]['id']);
-                          setState(() {
-                            isLoading=false;
-                            totalAmount=totalAmount-(products[index]['currentPrice']*products[index]['quantity']);
-                            getProduct();
-                          });
-                          Fluttertoast.showToast(msg: "Product removed from cart",backgroundColor: Colors.black,textColor: Colors.white,);
-                        },
-                        color: Colors.white38,
-                        elevation: .3,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text("Remove"),
-                            SizedBox(width: 10),
-                            Icon(Icons.delete)
+                            Expanded(
+                              flex: 2,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        '${products[index]['brand']}',
+                                        style: TextStyle(
+                                            fontSize: 20.0, fontWeight: FontWeight.w600),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 5.0, bottom: 5.0),
+                                      child: Text('${products[index]['description']}',
+                                        style: TextStyle(
+                                            fontSize: 15.0,
+                                            fontWeight: FontWeight.w300,
+                                            color: Colors.black54),
+                                      ),
+                                    ),
+                                    Row(
+                                      children: <Widget>[
+                                        Text(
+                                          "Size:",
+                                          style: TextStyle(
+                                              fontSize: 15.0, fontWeight: FontWeight.bold),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(products[index]['size']),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: <Widget>[
+                                        Text(
+                                          '₹${products[index]['currentPrice']}',
+                                          style: TextStyle(
+                                              color: Colors.redAccent,
+                                              fontSize: 20.0,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                        SizedBox(
+                                          width: 10.0,
+                                        ),
+                                        Text(
+                                          '${products[index]['oldPrice']}',
+                                          style: TextStyle(
+                                            fontSize: 15.0,
+                                            color: Colors.black54,
+                                            fontWeight: FontWeight.w500,
+                                            decoration: TextDecoration.lineThrough,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ],
                         ),
-                      )
-                    ],
+                        MaterialButton(
+                          onPressed: () {
+                            setState(() {
+                              isLoading=true;
+                            });
+                            _cartProductService.deleteData(products[index]['id']);
+                            setState(() {
+                              isLoading=false;
+                              totalAmount=totalAmount-(products[index]['currentPrice']*products[index]['quantity']);
+                              getProduct();
+                            });
+                            Fluttertoast.showToast(msg: "Product removed from cart",backgroundColor: Colors.black,textColor: Colors.white,);
+                          },
+                          color: Colors.white38,
+                          elevation: .3,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Text("Remove"),
+                              SizedBox(width: 10),
+                              Icon(Icons.delete)
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -234,7 +260,7 @@ class _CartState extends State<Cart> {
                   onPressed: (){
                     if(products.length!=0){
                     Navigator.push(
-                        context, MaterialPageRoute(builder: (context) => Address()));}
+                        context, MaterialPageRoute(builder: (context) => Address(totalAmount: totalAmount,)));}
                     else{
                       Fluttertoast.showToast(msg: "your cart is empty",backgroundColor: Colors.black,textColor: Colors.white,);
                     }
@@ -249,8 +275,6 @@ class _CartState extends State<Cart> {
       ),
     );
   }
-
-
 }
 class EmptyCart extends StatelessWidget {
   @override

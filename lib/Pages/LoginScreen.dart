@@ -1,6 +1,4 @@
 //===packages====
-import 'package:ecommerce/components/loading.dart';
-import 'package:ecommerce/db/functions.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -8,6 +6,8 @@ import 'package:provider/provider.dart';
 
 //===local_files=====
 import 'package:flutter/material.dart';
+import 'package:ecommerce/components/loading.dart';
+import 'package:ecommerce/db/functions.dart';
 import 'package:ecommerce/components/constants.dart';
 import 'package:ecommerce/components/Round_button.dart';
 import 'package:ecommerce/Pages/HomePage.dart';
