@@ -2,7 +2,7 @@ import 'package:ecommerce/Pages/Prduct_Details.dart';
 import'package:ecommerce/db/Product_service.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../components/loading.dart';
+
 
 class Products extends StatefulWidget {
   final filter;
@@ -87,7 +87,9 @@ void checkFilter(filter){
   // ignore: non_constant_identifier_names
   @override
   Widget build(BuildContext context) {
-    return isLoading?Loading():GridView.builder(
+    return isLoading?Container(color: Colors.white,):GridView.builder(
+      physics: ClampingScrollPhysics(),
+      shrinkWrap: true,
         itemCount: products.length,
         gridDelegate:
             SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),

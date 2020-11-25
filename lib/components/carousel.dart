@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ecommerce/components/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import '../db/Carousel_service.dart';
@@ -40,7 +39,7 @@ class _CarouselImagesState extends State<CarouselImages> {
 
   @override
   Widget build(BuildContext context) {
-    return isLoading?Loading():Carousel(
+    return isLoading?Container(color: Colors.white,):Carousel(
       boxFit: BoxFit.cover,
       dotBgColor: Colors.transparent,
       images: [

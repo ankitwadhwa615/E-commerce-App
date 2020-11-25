@@ -29,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final _auth = FirebaseAuth.instance;
   bool isLoading = false;
   List<DocumentSnapshot> users = <DocumentSnapshot>[];
+  
   // bool search = false;
 
   @override
@@ -75,9 +76,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
-    return isLoading
-        ? Loading()
-        : Scaffold(
+    if (isLoading) {
+      return Loading();
+    } else {
+      return Scaffold(
             appBar: AppBar(
                 elevation: 0.1,
                 backgroundColor: Colors.black,
@@ -221,6 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             body: ListView(
+              shrinkWrap: true,
               children: <Widget>[
                 Container(
                   height: 200,
@@ -248,14 +251,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 Card(
-                  child: Container(
-                    height: 420,
-                    child: Products(''),
-                  ),
+                  child: Products(''),
                 ),
               ],
             ),
           );
+    }
   }
 
   showAlertDialog(BuildContext context) {
