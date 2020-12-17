@@ -8,14 +8,16 @@ import 'package:animated_splash/animated_splash.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MultiProvider(providers: [
-    ChangeNotifierProvider.value(value: UserProvider.initialize())
-  ] ,
+  runApp(MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: UserProvider.initialize())
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         home: SplashClass(),
       )));
 }
+
 class SplashClass extends StatefulWidget {
   @override
   _SplashClassState createState() => _SplashClassState();
@@ -24,10 +26,10 @@ class SplashClass extends StatefulWidget {
 class _SplashClassState extends State<SplashClass> {
   @override
   Widget build(BuildContext context) {
-    return  AnimatedSplash(
+    return AnimatedSplash(
       type: AnimatedSplashType.StaticDuration,
       duration: 1500,
-      imagePath: 'images/1.jpg',
+      imagePath: 'images/splash.png',
       home: ScreensController(),
     );
   }
@@ -37,7 +39,7 @@ class ScreensController extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
-    switch(user.status){
+    switch (user.status) {
       case Status.Uninitialized:
         return Loading();
       case Status.Unauthenticated:
@@ -45,7 +47,8 @@ class ScreensController extends StatelessWidget {
         return LoginScreen();
       case Status.Authenticated:
         return HomeScreen();
-      default: return LoginScreen();
+      default:
+        return LoginScreen();
     }
   }
 }
