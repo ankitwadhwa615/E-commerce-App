@@ -145,13 +145,13 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                                 style: TextStyle(
                                                     fontSize: 15.0,
                                                     fontWeight:
-                                                    FontWeight.bold),
+                                                        FontWeight.bold),
                                               ),
                                               Padding(
                                                 padding:
-                                                const EdgeInsets.all(4.0),
-                                                child:
-                                                Text('${orders[index]['date']}/${orders[index]['month']}/${orders[index]['year']}'),
+                                                    const EdgeInsets.all(4.0),
+                                                child: Text(
+                                                    '${orders[index]['date']}/${orders[index]['month']}/${orders[index]['year']}'),
                                               ),
                                             ],
                                           ),
@@ -168,7 +168,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                                 padding:
                                                     const EdgeInsets.all(6.0),
                                                 child: Text(
-                                                    '${orders[index]['paymentMethod']}',),
+                                                  '${orders[index]['paymentMethod']}',
+                                                ),
                                               )
                                             ],
                                           ),

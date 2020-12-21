@@ -159,19 +159,14 @@ class _AddressState extends State<Address> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => PaymentCheckout(
-                                            totalAmount: widget.totalAmount,
-                                            name: address[0]['name'],
-                                            mobileNo:
-                                            address[0]['mobileNo'],
-                                            pinCode:
-                                            address[0]['pinCode'],
-                                            address:
-                                            address[0]['address'],
-                                            locality:
-                                            address[0]['locality'],
-                                            city: address[0]['city'],
-                                            state: address[0]['state']
-                                          )));
+                                          totalAmount: widget.totalAmount,
+                                          name: address[0]['name'],
+                                          mobileNo: address[0]['mobileNo'],
+                                          pinCode: address[0]['pinCode'],
+                                          address: address[0]['address'],
+                                          locality: address[0]['locality'],
+                                          city: address[0]['city'],
+                                          state: address[0]['state'])));
                             },
                             color: Colors.black,
                             child: Text(

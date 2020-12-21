@@ -335,11 +335,12 @@ class _PaymentCheckoutState extends State<PaymentCheckout> {
         color: Colors.black,
         child: Padding(
           padding: const EdgeInsets.all(15.0),
-          child: Row(mainAxisAlignment: MainAxisAlignment.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 'Continue Shopping',
-                style: TextStyle(color: Colors.white,fontSize: 15),
+                style: TextStyle(color: Colors.white, fontSize: 15),
               ),
             ],
           ),
@@ -374,12 +375,10 @@ class _PaymentCheckoutState extends State<PaymentCheckout> {
       ),
     );
     showDialog(
-      barrierDismissible: false,
+        barrierDismissible: false,
         context: context,
         builder: (BuildContext context) {
-          return WillPopScope(
-            onWillPop: (){},
-              child: alert);
+          return WillPopScope(onWillPop: () {}, child: alert);
         });
   }
 }
